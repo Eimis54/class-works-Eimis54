@@ -1,0 +1,131 @@
+using System.Text.Json;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        List<Products> source = new List<Products>();
+        List<ProductsPriceHistory> priceHistory = new List<ProductsPriceHistory>();
+
+        try
+        {
+            using (StreamReader r = new StreamReader("C:\\Users\\eimantas.virksas\\Desktop\\Products.json"))
+            {
+                string json = r.ReadToEnd();
+                source = JsonSerializer.Deserialize<List<Products>>(json);
+            }
+        }
+        catch (FileNotFoundException ex)
+        {
+            Console.WriteLine($"File not found: {ex.Message}");
+            return;
+        }
+        catch (JsonException ex)
+        {
+            Console.WriteLine($"JSON deserialization error: {ex.Message}");
+            return;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+            return;
+        }
+
+        try
+        {
+            using (StreamReader r = new StreamReader("C:\\Users\\eimantas.virksas\\Desktop\\ProductsPriceHistory.json"))
+            {
+                string json = r.ReadToEnd();
+                priceHistory = JsonSerializer.Deserialize<List<ProductsPriceHistory>>(json);
+            }
+        }
+        catch (FileNotFoundException ex)
+        {
+            Console.WriteLine($"File not found: {ex.Message}");
+            return;
+        }
+        catch (JsonException ex)
+        {
+            Console.WriteLine($"JSON deserialization error: {ex.Message}");
+            return;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+            return;
+        }
+
+
+        List<DataReady> products = source.Select(p => new DataReady
+        {
+            ID = p.ProductID,
+            ProductName = p.Name,
+            productNumber = p.ProductNumber,
+            standartCost = p.StandartCost,
+            Price = p.ListPrice,
+            ManufactureDays = p.DaysToManufacture,
+            StartDate = p.SellStartDate,
+            modifiedDate = p.ModifiedDate
+        }).ToList();
+
+        Console.WriteLine($"Processed {products.Count} products from Products.json.");
+
+        Console.WriteLine("Products:");
+        foreach (var p in products)
+        {
+            Console.WriteLine($"ID: {p.ID}");
+            Console.WriteLine($"Product Name: {p.ProductName}");
+            Console.WriteLine($"Product Number: {p.productNumber}");
+            Console.WriteLine($"Standard Cost: {p.standartCost}");
+            Console.WriteLine($"Price: {p.Price}");
+            Console.WriteLine($"Manufacture Days: {p.ManufactureDays}");
+            Console.WriteLine($"Start Date: {p.StartDate}");
+            Console.WriteLine($"Modified Date: {p.modifiedDate}");
+            Console.WriteLine();
+        }
+
+        Console.WriteLine("Price History Data:");
+        foreach (var h in priceHistory)
+        {
+            Console.WriteLine($"ID: {h.ProductID}");
+            Console.WriteLine($"Start Date: {h.StartDate}");
+            Console.WriteLine($"End Date: {h.EndDate}");
+            Console.WriteLine($"Price List: {h.ListPrice}");
+            Console.WriteLine($"Modified date: {h.ModifiedDate}");
+            Console.WriteLine();
+        }
+    }
+
+    public class Products
+    {
+        public int ProductID { get; set; }
+        public string Name { get; set; }
+        public string ProductNumber { get; set; }
+        public double StandartCost { get; set; }
+        public double ListPrice { get; set; }
+        public int DaysToManufacture { get; set; }
+        public DateTime SellStartDate { get; set; }
+        public DateTime ModifiedDate { get; set; }
+    }
+
+    public class DataReady
+    {
+        public int ID { get; set; }
+        public string ProductName { get; set; }
+        public string productNumber { get; set; }
+        public double standartCost { get; set; }
+        public double Price { get; set; }
+        public int ManufactureDays { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime modifiedDate { get; set; }
+    }
+
+    public class ProductsPriceHistory
+    {
+        public int ProductID { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public double ListPrice { get; set; }
+        public DateTime ModifiedDate { get; set; }
+    }
+}
